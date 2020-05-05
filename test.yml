@@ -2,12 +2,12 @@ config:
   target: "{{ $processEnvironment.ARTILLERY_TRACKER_TARGET }}"
   phases:
     - duration: 60
-      arrivalRate: 50
-    - durarion: 120
-      arrivalRate: 50
-      rampTo: 250
-    - duration: 600
-      arrivalRate: 250
+      arrivalRate: 5
+    # - durarion: 120
+    #   arrivalRate: 55
+    #   rampTo: 25
+    # - duration: 600
+    #   arrivalRate: 25
 
   payload:
     path: "users.csv"
