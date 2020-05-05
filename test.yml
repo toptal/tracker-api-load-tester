@@ -1,0 +1,70 @@
+config:
+  target: "{{ $processEnvironment.ARTILLERY_TRACKER_TARGET }}"
+  phases:
+    - duration: 60
+      arrivalRate: 50
+    - durarion: 120
+      arrivalRate: 50
+      rampTo: 250
+    - duration: 600
+      arrivalRate: 250
+
+  payload:
+    path: "users.csv"
+    fields:
+      - "email"
+      - "password"
+scenarios:
+  - flow:
+    - post:
+        name: "Authenticate"
+        url: "/sessions"
+        capture:
+          json: $.access_token
+          as: accessToken
+        json:
+          email: "{{ email }}"
+          password: "{{ password }}"
+
+    - get:
+        name: "Fetch the projects' list"
+        url: "/projects?access_token={{ accessToken }}"
+
+    - post:
+        name: "Create a project"
+        url: "/projects?access_token={{ accessToken }}"
+        capture:
+          json: $.project.id
+          as: projectId
+        json:
+          name: "Test"
+
+    - get:
+        name: "Fetch the projects' list"
+        url: "/projects?access_token={{ accessToken }}"
+
+    - post:
+        name: "Create an activity"
+        url: "/projects/{{ projectId }}/activities?access_token={{ accessToken }}"
+        json:
+          start_time: "2020-04-29T00:00:00.000Z"
+        capture:
+          json: $.activity.id
+          as: activityId
+
+    # Triggers HPE_INVALID_CONSTANT in the report because of empty response
+    - put:
+        name: "Track an activity"
+        url: "/activities/{{ activityId }}/track?access_token={{ accessToken }}"
+        json:
+          end_time: "2020-04-29T00:01:00Z"
+
+    # Very slow
+    # - get:
+    #     name: "Fetch the projects list for the web app"
+    #     url: "/web/projects?access_token={{ accessToken }}"
+
+    - get:
+        name: "Fetch activities"
+        url: "/activities/my?access_token={{ accessToken }}"
+
