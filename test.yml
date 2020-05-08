@@ -2,12 +2,12 @@ config:
   target: "{{ $processEnvironment.ARTILLERY_TRACKER_TARGET }}"
   phases:
     - duration: 60
-      arrivalRate: 10
+      arrivalRate: 5
     - duration: 120
-      arrivalRate: 10
-      rampTo: 25
+      arrivalRate: 5
+      rampTo: 15
     - duration: 600
-      arrivalRate: 25
+      arrivalRate: 15
   environments:
     development:
       phases:
