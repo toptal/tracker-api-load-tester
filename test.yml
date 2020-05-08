@@ -2,69 +2,130 @@ config:
   target: "{{ $processEnvironment.ARTILLERY_TRACKER_TARGET }}"
   phases:
     - duration: 60
-      arrivalRate: 5
-    # - durarion: 120
-    #   arrivalRate: 55
-    #   rampTo: 25
-    # - duration: 600
-    #   arrivalRate: 25
+      arrivalRate: 10
+    - durarion: 120
+      arrivalRate: 10
+      rampTo: 25
+    - duration: 600
+      arrivalRate: 25
+  environments:
+    development:
+      phases:
+        - duration: 20
+          arrivalRate: 2
 
   payload:
     path: "users.csv"
     fields:
       - "email"
       - "password"
+  variables:
+    startDate: "2020-04-01"
+    endDate: "2020-05-01"
 scenarios:
-  - flow:
-    - post:
-        name: "Authenticate"
-        url: "/sessions"
-        capture:
-          json: $.access_token
-          as: accessToken
-        json:
-          email: "{{ email }}"
-          password: "{{ password }}"
+  - name: "Track an activity"
+    weight: 3
+    flow:
+      - post:
+          name: "Authenticate"
+          url: "/sessions"
+          capture:
+            json: $.access_token
+            as: accessToken
+          json:
+            email: "{{ email }}"
+            password: "{{ password }}"
 
-    - get:
-        name: "Fetch the projects' list"
-        url: "/projects?access_token={{ accessToken }}"
+      - get:
+          name: "Fetch the projects' list"
+          url: "/projects?access_token={{ accessToken }}"
+          capture:
+            json: $.projects[0].id
+            as: projectId
 
-    - post:
-        name: "Create a project"
-        url: "/projects?access_token={{ accessToken }}"
-        capture:
-          json: $.project.id
-          as: projectId
-        json:
-          name: "Test"
+      - get:
+          name: "Fetch the projects' list"
+          url: "/projects?access_token={{ accessToken }}"
 
-    - get:
-        name: "Fetch the projects' list"
-        url: "/projects?access_token={{ accessToken }}"
+      - post:
+          name: "Create an activity"
+          url: "/projects/{{ projectId }}/activities?access_token={{ accessToken }}"
+          json:
+            start_time: "2020-04-29T00:00:00.000Z"
+          capture:
+            json: $.activity.id
+            as: activityId
+      - think: 5
+      # Triggers HPE_INVALID_CONSTANT in the report because of empty response
+      - put:
+          name: "Track an activity"
+          url: "/activities/{{ activityId }}/track?access_token={{ accessToken }}"
+          json:
+            end_time: "2020-04-29T00:01:00Z"
 
-    - post:
-        name: "Create an activity"
-        url: "/projects/{{ projectId }}/activities?access_token={{ accessToken }}"
-        json:
-          start_time: "2020-04-29T00:00:00.000Z"
-        capture:
-          json: $.activity.id
-          as: activityId
+  - name: "Fetch the projects list for the desktop several times"
+    weight: 3
+    flow:
+      - post:
+          name: "Authenticate"
+          url: "/sessions"
+          capture:
+            json: $.access_token
+            as: accessToken
+          json:
+            email: "{{ email }}"
+            password: "{{ password }}"
+      - get:
+          name: "Fetch the projects' list"
+          url: "/projects?access_token={{ accessToken }}"
+      - think: 2
+      - get:
+          name: "Fetch the projects' list"
+          url: "/projects?access_token={{ accessToken }}"
+      - think: 2
+      - get:
+          name: "Fetch the projects' list"
+          url: "/projects?access_token={{ accessToken }}"
+      - think: 2
+      - get:
+          name: "Fetch the projects' list"
+          url: "/projects?access_token={{ accessToken }}"
+      - think: 2
+      - get:
+          name: "Fetch the projects' list"
+          url: "/projects?access_token={{ accessToken }}"
+      - think: 2
 
-    # Triggers HPE_INVALID_CONSTANT in the report because of empty response
-    - put:
-        name: "Track an activity"
-        url: "/activities/{{ activityId }}/track?access_token={{ accessToken }}"
-        json:
-          end_time: "2020-04-29T00:01:00Z"
+  - name: "Fetch reports and activities"
+    weight: 1
+    flow:
+      - post:
+          name: "Authenticate"
+          url: "/sessions"
+          capture:
+            json: $.access_token
+            as: accessToken
+          json:
+            email: "{{ email }}"
+            password: "{{ password }}"
+      - get:
+          name: "Fetch activities"
+          url: "/activities/my?access_token={{ accessToken }}&project_ids=all&start_date={{ startDate }}&end_date={{ endDate }}"
+      - think: 3
+      - get:
+          name: "Fetch reports' filters"
+          url: "/reports/filters?access_token={{ accessToken }}"
+      - think: 3
+      - get:
+          name: "Fetch a chart"
+          url: "/reports/chart?access_token={{ accessToken }}&project_ids=all&worker_ids=all&start_date={{ startDate }}&end_date={{ endDate }}"
+      - think: 3
+      - get:
+          name: "Fetch a timetable"
+          url: "/reports/timetable?access_token={{ accessToken }}&project_ids=all&worker_ids=all&start_date={{ startDate }}&end_date={{ endDate }}"
+      - think: 3
+      - get:
+          name: "Fetch activities' list"
+          url: "/reports/activities?access_token={{ accessToken }}&project_ids=all&worker_ids=all&start_date={{ startDate }}&end_date={{ endDate }}"
 
-    # Very slow
-    # - get:
-    #     name: "Fetch the projects list for the web app"
-    #     url: "/web/projects?access_token={{ accessToken }}"
-
-    - get:
-        name: "Fetch activities"
-        url: "/activities/my?access_token={{ accessToken }}"
 
