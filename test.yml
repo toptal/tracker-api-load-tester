@@ -3,7 +3,7 @@ config:
   phases:
     - duration: 60
       arrivalRate: 10
-    - durarion: 120
+    - duration: 120
       arrivalRate: 10
       rampTo: 25
     - duration: 600
