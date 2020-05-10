@@ -1,13 +1,15 @@
 config:
   target: "{{ $processEnvironment.ARTILLERY_TRACKER_TARGET }}"
+  tls: 
+    rejectUnauthorized: false
   phases:
     - duration: 60
-      arrivalRate: 5
+      arrivalRate: 3
     - duration: 120
-      arrivalRate: 5
-      rampTo: 15
+      arrivalRate: 3
+      rampTo: 6
     - duration: 600
-      arrivalRate: 15
+      arrivalRate: 6
   environments:
     development:
       phases:
