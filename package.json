@@ -4,9 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "artillery run test.yml",
-    "test": "artillery quick --count 10 -n 20 https://artillery.io/",
-    "local": "artillery run -e development test.yml"
+    "start": "node index.js && artillery run test.yml",
+    "test": "artillery quick --count 10 -n 20 https://artillery.io/"
   },
   "author": "",
   "license": "ISC",

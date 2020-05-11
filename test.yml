@@ -10,17 +10,11 @@ config:
       rampTo: 6
     - duration: 600
       arrivalRate: 6
-  environments:
-    development:
-      phases:
-        - duration: 20
-          arrivalRate: 2
 
   payload:
-    path: "users.csv"
+    path: "tokens.csv"
     fields:
-      - "email"
-      - "password"
+      - "accessToken"
   variables:
     startDate: "2020-04-01"
     endDate: "2020-05-01"
@@ -28,16 +22,6 @@ scenarios:
   - name: "Track an activity"
     weight: 3
     flow:
-      - post:
-          name: "Authenticate"
-          url: "/sessions"
-          capture:
-            json: $.access_token
-            as: accessToken
-          json:
-            email: "{{ email }}"
-            password: "{{ password }}"
-
       - get:
           name: "Fetch the projects' list"
           url: "/projects?access_token={{ accessToken }}"
@@ -68,15 +52,6 @@ scenarios:
   - name: "Fetch the projects list for the desktop several times"
     weight: 3
     flow:
-      - post:
-          name: "Authenticate"
-          url: "/sessions"
-          capture:
-            json: $.access_token
-            as: accessToken
-          json:
-            email: "{{ email }}"
-            password: "{{ password }}"
       - get:
           name: "Fetch the projects' list"
           url: "/projects?access_token={{ accessToken }}"
@@ -101,15 +76,6 @@ scenarios:
   - name: "Fetch reports and activities"
     weight: 1
     flow:
-      - post:
-          name: "Authenticate"
-          url: "/sessions"
-          capture:
-            json: $.access_token
-            as: accessToken
-          json:
-            email: "{{ email }}"
-            password: "{{ password }}"
       - get:
           name: "Fetch activities"
           url: "/activities/my?access_token={{ accessToken }}&project_ids=all&start_date={{ startDate }}&end_date={{ endDate }}"
@@ -129,5 +95,3 @@ scenarios:
       - get:
           name: "Fetch activities' list"
           url: "/reports/activities?access_token={{ accessToken }}&project_ids=all&worker_ids=all&start_date={{ startDate }}&end_date={{ endDate }}"
-
-

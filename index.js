@@ -43,7 +43,7 @@ const getToken = (email, password) => {
 }
 
 (async () => {
-  const tokens = [];
+  let tokens = [];
   const users = await readUsers();
 
   requests = users.map((user) => {
@@ -51,7 +51,7 @@ const getToken = (email, password) => {
   });
 
   await Promise.all(requests)
-    .then(responses => responses.map((r) => tokens.push(r)))
+    .then(responses => tokens = [...responses])
     .catch(err => console.log(err))
 
   file = fs.writeFile('tokens.csv', tokens.join('\n'), (err) => console.log(err))

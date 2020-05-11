@@ -9,12 +9,6 @@ to measure performance.
 ARTILLERY_TRACKER_TARGET='http://localhost:3000' yarn start
 ```
 
-For local testing with reduced load
-
-```
-ARTILLERY_TRACKER_TARGET='http://localhost:3000' yarn local
-```
-
 
 ## Installation
 
