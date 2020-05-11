@@ -11,6 +11,8 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "artillery": "^1.6.0"
+    "artillery": "^1.6.0",
+    "axios": "^0.19.2",
+    "csv": "^5.3.2"
   }
 }
