@@ -18,6 +18,13 @@ Requires Node.js and Yarn
 yarn install
 ```
 
+Alternatively Docker can be used
+
+```
+docker build -t <image_tag> .
+docker run -e "ARTILLERY_TRACKER_TARGET=http://host.docker.internal:3000" -it <image_tag> yarn start
+```
+
 ## Current load settings:
 
 
