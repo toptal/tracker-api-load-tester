@@ -1,7 +1,7 @@
-FROM node:12
+FROM node:12-slim
 
-WORKDIR .
-
+WORKDIR /load-tester
+COPY package.json yarn.lock .
+RUN yarn install
 COPY . .
-
-RUN npm install
+CMD ["yarn", "start"]
